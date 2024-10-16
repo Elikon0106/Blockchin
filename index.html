@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html>
+<head><script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.0.0/crypto-js.min.js"></script>
+
+    <title>ISS - 33 BLOCKCHAIN DEMO</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+        /* Add CSS styles for formatting the page */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f2f2f2;
+        }
+
+        .header {
+            background-color: #333;
+            color: white;
+            text-align: center;
+            padding: 2px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .tabs {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+
+        .tab {
+            padding: 10px 20px;
+            cursor: pointer;
+            background-color: #f2f2f2;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            margin: 0 5px;
+            font-weight: bold;
+            transition: background-color 0.3s;
+        }
+
+        .tab.active {
+            background-color: #333;
+            color: white;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .transaction-form {
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+            background-color: #fff;
+            border: 1px solid #e0e0e0;
+            border-radius: 5px;
+            padding: 20px;
+        }
+
+        .transaction-form label,
+        .transaction-form input {
+            margin-bottom: 10px;
+            width: 100%;
+            max-width: 300px;
+            box-sizing: border-box;
+            padding: 5px;
+        }
+
+        .transaction-form button {
+            cursor: pointer;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            padding: 10px 20px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            transition: background-color 0.3s;
+            width: 100%;
+            max-width: 300px;
+        }
+
+        .transaction-form button:hover {
+            background-color: #45a049;
+        }
+
+        .blockchain {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .block {
+            background-color: #ffffff;
+            border: 1px solid #e0e0e0;
+            border-radius: 5px;
+            padding: 10px;
+            margin: 10px;
+            max-width: 600px;
+        }
+
+        .block h3 {
+            margin-top: 0;
+        }
+
+        .block p {
+            margin: 5px 0;
+        }
+
+        #timer {
+            text-align: center;
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+
+        .footer {
+            background-color: #333;
+            color: white;
+            text-align: center;
+            padding: 10px;
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+        }
+        .navigation {
+    margin-top: 10px;
+}
+
+.navigation ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.navigation li {
+    display: inline-block;
+    margin-right: 20px;
+}
+
+.navigation a {
+    text-decoration: none;
+    color: white;
+    font-weight: bold;
+    transition: color 0.3s;
+}
+
+.navigation a:hover {
+    color: #ddd;
+}
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>АҚЖ - 33 Блокчейн DEMO</h1>
+    </div>
+    <div class="container">
+        <div class="tabs">
+            <div class="tab active" onclick="showTab('sender-tab')">Транзакция қосу</div>
+            <div class="tab" onclick="showTab('blockchain-tab')">Блокчейн</div>
+            <div class="tab" onclick="showTab('about-tab')">Қосымша</div> <!-- New "About" tab -->
+        </div>
+        <div class="tab-content active" id="sender-tab">
+            <h2>Транзакция қосу</h2>
+            <div class="transaction-form">
+                <div>
+                    <label for="sender_name">Жіберуші:</label>
+                    <input type="text" id="sender_name" />
+                </div>
+                <div>
+                    <label for="sender_address">Жіберуші шоты:</label>
+                    <input type="text" id="sender_address" />
+                </div>
+                <div>
+                    <label for="receiver_name">Қабылдаушы:</label>
+                    <input type="text" id="receiver_name" />
+                </div>
+                <div>
+                    <label for="receiver_address">Қабылдаушы шоты:</label>
+                    <input type="text" id="receiver_address" />
+                </div>
+                <div>
+                    <label for="amount">Сомасы:</label>
+                    <input type="text" id="amount" />
+                </div>
+                <div>
+                    <button onclick="addTransaction()">Транзакция жіберу</button>
+                </div>
+            </div>
+        </div>
+        <div class="tab-content" id="blockchain-tab">
+            <h2>Блокчейн</h2>
+            <div class="blockchain" id="blockchain"></div>
+        </div>
+        <div class="tab-content" id="about-tab"> <!-- New "About" content -->
+            <h2>Блокчейн туралы</h2>
+    <p>Блокчейн технологиясына қош келдіңіз!</p>
+    <p><strong>Блокчейн мақсаты:</strong></p>
+    <p>Бұл веб-сайттың мақсаты блокчейннің қалай жұмыс істейтінін интерактивті көрсету болып табылады. Мұнда транзакцияларды қосуға және олардың өзгермейтін жазбалар тізбегін құра отырып, блоктарға қалай өндірілгенін көруге болады.</p>
+
+    <h3>Блокчейн жұмыс істеу принципі:</h3>
+    <ol>
+        <li><strong>Транзакция қосу:</strong> Бастау үшін «Транзакция қосу» қойындысына өтіңіз. Жіберушінің аты, мекенжайы, алушының аты, мекенжайы және жібергіңіз келетін сома сияқты қажетті мәліметтерді толтырыңыз. Оны тау-кен пулына қосу үшін «Транзакцияны жіберу» түймесін басыңыз.</li>
+        <li><strong>Майнинг процесі:</strong> Майнинг процесі тау-кен пулынан бірнеше транзакцияларды жинайды және жаңа блокты жасайды. Блок тізбекті құрайтын алдыңғы блоктың криптографиялық хэшін қамтиды. Майнинг әр 20 секунд сайын автоматты түрде орындалады.</li>
+        <li><strong>Блокчейн:</strong> Кері хронологиялық тәртіпте блоктар тізімін көру үшін «Блокчейн» қойындысына өтіңіз. Әрбір блокта оның индексі, уақыт белгісі, алдыңғы хэш, ағымдағы хэш және ол ұстайтын транзакциялар бар.</li>
+        <li><strong>Блок құрылымы:</strong> Әрбір блок индекстен (блок нөмірі), уақыт белгісінен (ол өндірілген кезде), алдыңғы блоктың хэшінен (оны алдыңғы блокпен байланыстыратын) және ағымдағы блоктың хэшінен (оның деректері негізінде жасалған) тұрады.</li>
+        <li><strong>Қауіпсіздік:</strong> Блокчейннің өзгермейтіндігі мен қауіпсіздігі криптографиялық хэштеу арқылы қамтамасыз етіледі, бұл алдыңғы жазбаларды өзгерту мүмкін емес. Блоктағы кез келген өзгерту оның хэшін өзгертеді және келесі блоктарды жарамсыз етеді.</li>
+    </ol>
+    <h3>Функция жұмыс істеуі:</h3>
+    <ol>
+        <li><strong>hashCode(str) </strong>Бұл функция жолды (str) енгізу ретінде қабылдайды және деректерді оқылатын пішінде көрсететін хэш кодын қайтарады. Бұл жолды бірегей санға түрлендірудің қарапайым жолы.
+        </li>
+        <li><strong>calculateHash(index, previousHash, timestamp, data)</strong>Бұл функция блоктың хэшін есептеу үшін пайдаланылады. Ол төрт параметрді қабылдайды: индекс (блок нөмірі), алдыңғыХэш (алдыңғы блоктың хэші), уақыт белгісі (ағымдағы уақыт) және деректер (блоктағы транзакциялар). Ол біріктірілген деректер үшін хэш кодын жасау үшін hashCode функциясын пайдаланады және есептелген хэшті қайтарады.</li>
+        <li><strong>createNewBlock(previousBlock, data)</strong> оның функциясы берілген алдыңғыБлок (блокчейндегі соңғы блок) және деректер (транзакциялар) негізінде жаңа блокты жасайды. Ол accountHash функциясын пайдаланып, жаңа блок үшін ағымдағы уақыт белгісін, индексті және хэшті есептейді. Жаңа блок барлық қажетті ақпаратпен қайтарылады.</li>
+        <li><strong>addTransaction()</strong>  Бұл функция пайдаланушы веб-сайттағы «Транзакцияны жіберу» түймесін басқан кезде шақырылады. Ол деректерді енгізу өрістерінен (жіберушінің аты, мекенжайы, алушының аты, мекенжайы және сомасы) жинайды және транзакция деректерінің жолын жасайды. Бұл транзакция деректері блокқа өндіруді күтіп тұрған күтудегі транзакцияларды көрсететін miningTransactions массивіне қосылады.</li>
+        <li><strong>updateBlockchain() </strong> Бұл функция веб-сайттағы «Блокчейн» қойындысын блокчейннің ағымдағы күйімен жаңартады. Ол блокчейн массиві (өндірілген блоктар жинағы) арқылы қайталанады және әрбір блоктың мәліметтерін (индекс, уақыт белгісі, алдыңғы хэш, ағымдағы хэш және деректер) көрсету үшін HTML элементтерін жасайды. Блоктар кері ретпен, ең жаңа блок жоғарғы жағында көрсетіледі.</li>
+        <li><strong>mineBlock()</strong> Бұл функция майнинг процесін имитациялау үшін автоматты түрде әрбір 20 секунд сайын шақырылады (кері санақ таймеріне негізделген). Егер miningTransactions массивінде күтудегі транзакциялар болса, ол createNewBlock функциясы арқылы жаңа блок жасайды, оны блокчейнге қосады және updateBlockchain функциясын пайдаланып блокчейн көрінісін жаңартады. Өндірілген транзакциялар одан кейін miningTransactions массивінен тазартылады.</li>
+        <li><strong>updateTimer() </strong>Бұл функция веб-сайтта көрсетілген таймерді жаңартып, келесі өндіру процесіне дейін кері санақты көрсетеді. Ол әр секунд сайын timerValue айнымалы мәнін азайтады және таймер элементінің мазмұнын жаңартады. Таймер 0-ге жеткенде, ол жаңа блокты өндіру үшін mineBlock функциясын шақырады, таймер мәнін 20-ға қалпына келтіреді және қайтадан кері санауды бастайды.</li>
+    </ol>
+    
+    <p>Функциялар қарапайым блокчейн демонстрациясын жасау үшін бірге жұмыс істейді. Пайдаланушылар miningTransactions массивінде уақытша сақталатын транзакцияларды қоса алады. Әрбір 20 секунд сайын майнинг процесі іске қосылады, онда күтудегі транзакциялар жаңа блокқа топтастырылады және бұл блок блокчейнге қосылады. Блокчейн көрінісі жаңартылып, блоктарды кері ретпен көрсетеді, ең жаңа блок жоғарғы жағында. Бұл процесс нақты блокчейн жүйесінің қалай жұмыс істейтінін модельдейтін автоматтандырылған процесс. </p>
+    <p>Осы блокчейн демонстрациясының мүмкіндіктерін зерттеуге және осы революциялық технология криптовалюталар мен басқа да орталықтандырылмаған қолданбаларды қалай қуаттайтынын жақсырақ түсінуге арналған!.</p>
+        </div>
+        <div id="timer">20 секундта майнинг...</div>
+    </div>
+
+    <script>
+
+function calculateHash(index, previousHash, timestamp, data) {
+        const blockData = `${index}${previousHash}${timestamp}${data}`;
+        return CryptoJS.SHA256(blockData).toString();
+    }
+
+    // JavaScript code for interacting with the blockchain
+    const blockchainDiv = document.getElementById('blockchain');
+    let blockchain = [];
+    let transactionCount = 0;
+    let miningTransactions = [];
+
+    function createNewBlock(previousBlock, data) {
+        const index = previousBlock.index + 1;
+        const timestamp = Date.now() / 1000;
+        const previousHash = previousBlock.hash;
+        const hash = calculateHash(index, previousHash, timestamp, data);
+        return { index, previousHash, timestamp, data, hash };
+    }
+
+    function addTransaction() {
+        const senderName = document.getElementById('sender_name').value;
+        const senderAddress = document.getElementById('sender_address').value;
+        const receiverName = document.getElementById('receiver_name').value;
+        const receiverAddress = document.getElementById('receiver_address').value;
+        const amount = document.getElementById('amount').value;
+
+        const transactionData = `${++transactionCount}. Sender: ${senderName} (${senderAddress})\nReceiver: ${receiverName} (${receiverAddress})\nAmount: ${amount}`;
+        miningTransactions.push(transactionData);
+
+        // Clear input fields after adding a transaction
+        document.getElementById('sender_name').value = '';
+        document.getElementById('sender_address').value = '';
+        document.getElementById('receiver_name').value = '';
+        document.getElementById('receiver_address').value = '';
+        document.getElementById('amount').value = '';
+
+        updateBlockchain();
+    }
+
+    function updateBlockchain() {
+        const blockchainHTML = [];
+        for (let i = blockchain.length - 1; i >= 0; i--) {
+            const block = blockchain[i];
+            blockchainHTML.push(`
+                <div class="block">
+                    <h3>Блок #${block.index}</h3>
+                    <p>Уақыты: ${new Date(block.timestamp * 1000)}</p>
+                    <p>Алдыңғы блок хэш: ${block.previousHash}</p>
+                    <p>Хэш: ${block.hash}</p>
+                    <pre>${block.data}</pre>
+                </div>
+            `);
+        }
+
+        blockchainDiv.innerHTML = blockchainHTML.join('');
+    }
+
+    function mineBlock() {
+        if (miningTransactions.length > 0) {
+            const data = miningTransactions.join('\n');
+            const newBlock = createNewBlock(blockchain[blockchain.length - 1], data);
+            blockchain.push(newBlock);
+            miningTransactions = [];
+            updateBlockchain();
+        }
+    }
+
+    // Initial blockchain setup with the genesis block
+    const genesisBlock = {
+        index: 0,
+        previousHash: '0',
+        timestamp: Date.now() / 1000,
+        data: 'Genesis Block',
+        hash: calculateHash(0, '0', Date.now() / 1000, 'Genesis Block'),
+    };
+
+    blockchain.push(genesisBlock);
+    
+        
+
+        // Function to switch between tabs
+        function showTab(tabName) {
+            const tabs = document.querySelectorAll('.tab-content');
+            const activeTab = document.getElementById(tabName);
+
+            tabs.forEach((tab) => {
+                tab.classList.remove('active');
+            });
+
+            activeTab.classList.add('active');
+            const activeTabIdx = Array.from(tabs).indexOf(activeTab);
+
+            const tabButtons = document.querySelectorAll('.tab');
+            tabButtons.forEach((button, index) => {
+                if (index === activeTabIdx) {
+                    button.classList.add('active');
+                } else {
+                    button.classList.remove('active');
+                }
+            });
+        }
+        function addTransaction() {
+            const senderName = document.getElementById('sender_name').value;
+            const senderAddress = document.getElementById('sender_address').value;
+            const receiverName = document.getElementById('receiver_name').value;
+            const receiverAddress = document.getElementById('receiver_address').value;
+            const amount = document.getElementById('amount').value;
+
+            const transactionData = `${++transactionCount}. Жіберуші: ${senderName} (${senderAddress})\nҚабылдаушы: ${receiverName} (${receiverAddress})\nСомасы: ${amount}`;
+            miningTransactions.push(transactionData);
+
+            // Clear input fields after adding a transaction
+            document.getElementById('sender_name').value = '';
+            document.getElementById('sender_address').value = '';
+            document.getElementById('receiver_name').value = '';
+            document.getElementById('receiver_address').value = '';
+            document.getElementById('amount').value = '';
+        }
+
+        function mineBlock() {
+            const data = miningTransactions.join('\n');
+            const newBlock = createNewBlock(blockchain[blockchain.length - 1], data);
+            blockchain.push(newBlock);
+            miningTransactions = [];
+            updateBlockchain();
+        }
+
+        // Timer for block mining
+        const timerDiv = document.getElementById('timer');
+        let timerValue = 20;
+
+        function updateTimer() {
+            timerValue -= 1;
+            if (timerValue > 0) {
+                timerDiv.innerHTML = `Майнинг ${timerValue} секундта...`;
+            } else {
+                timerDiv.innerHTML = 'Майнинг...';
+                mineBlock();
+                timerValue = 20;
+            }
+        }
+
+        const countdownTimer = setInterval(updateTimer, 1000); // Update every second
+
+        // Function to switch between tabs
+        function showTab(tabName) {
+    const tabs = document.querySelectorAll('.tab-content');
+    const activeTab = document.getElementById(tabName);
+
+    tabs.forEach((tab) => {
+        tab.classList.remove('active');
+    });
+
+    activeTab.classList.add('active');
+    const activeTabIdx = Array.from(tabs).indexOf(activeTab);
+
+    const tabButtons = document.querySelectorAll('.tab');
+    tabButtons.forEach((button, index) => {
+        if (index === activeTabIdx) {
+            button.classList.add('active');
+        } else {
+            button.classList.remove('active');
+        }
+    });
+}
+
+    </script>
+</body>
+</html>
